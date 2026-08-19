@@ -1,0 +1,79 @@
+.hacker-header {
+  padding: 4rem 2rem;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid var(--border-dim);
+  background: linear-gradient(180deg, rgba(0, 255, 65, 0.05) 0%, rgba(5, 5, 5, 1) 100%);
+}
+
+.terminal-prompt-container {
+  max-width: 900px;
+  margin: 0 auto;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.5rem;
+}
+
+.terminal-line {
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.prompt-user {
+  color: var(--neon-green);
+  font-weight: 700;
+}
+
+.prompt-colon {
+  color: var(--text-main);
+}
+
+.prompt-path {
+  color: #3b82f6; /* Blueish for path */
+  font-weight: 700;
+}
+
+.prompt-symbol {
+  color: var(--text-main);
+}
+
+.prompt-cmd {
+  color: var(--text-main);
+  text-shadow: 0 0 5px rgba(255,255,255,0.3);
+}
+
+.output {
+  color: var(--text-muted);
+  font-size: 1.25rem;
+}
+
+.output-arrow {
+  color: var(--neon-cyan);
+}
+
+.cursor-line {
+  margin-top: 1rem;
+}
+
+.blinking-cursor {
+  display: inline-block;
+  width: 12px;
+  height: 24px;
+  background-color: var(--neon-green);
+  animation: blink 1s step-end infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+@media (max-width: 768px) {
+  .terminal-prompt-container {
+    font-size: 1.1rem;
+  }
+  .output {
+    font-size: 1rem;
+  }
+}

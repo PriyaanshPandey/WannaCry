@@ -1,0 +1,125 @@
+.capabilities-section {
+  max-width: 900px;
+  margin: 4rem auto;
+  padding: 0 2rem;
+}
+
+.terminal-window {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-dim);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+}
+
+.terminal-header {
+  background: #1a1a1a;
+  padding: 0.75rem 1rem;
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid var(--border-dim);
+}
+
+.terminal-dots {
+  display: flex;
+  gap: 8px;
+}
+
+.dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.dot.red { background-color: #ff5f56; }
+.dot.yellow { background-color: #ffbd2e; }
+.dot.green { background-color: #27c93f; }
+
+.terminal-title {
+  margin: 0 auto;
+  color: var(--text-muted);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  padding-right: 48px; /* Offset to center title correctly */
+}
+
+.mr-2 { margin-right: 0.5rem; }
+.ml-4 { margin-left: 1rem; }
+.text-muted { color: var(--text-muted); }
+.text-sm { font-size: 0.85rem; }
+
+.terminal-body {
+  padding: 1.5rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1rem;
+  color: var(--text-main);
+}
+
+.tree-root-label {
+  margin-bottom: 1rem;
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.tree-container {
+  border-left: 1px dashed var(--border-dim);
+  margin-left: 0.5rem;
+  padding-left: 0.5rem;
+}
+
+.tree-node {
+  margin: 0.25rem 0;
+}
+
+.tree-item {
+  display: flex;
+  align-items: center;
+  padding: 0.25rem 0;
+  cursor: default;
+  transition: background 0.2s;
+  border-radius: 4px;
+}
+
+.tree-item:hover {
+  background: rgba(255,255,255,0.05);
+}
+
+.tree-item.folder {
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.tree-icon-wrapper {
+  display: flex;
+  align-items: center;
+  color: var(--text-muted);
+  width: 20px;
+}
+
+.tree-icon-wrapper.invisible {
+  visibility: hidden;
+}
+
+.file-icon {
+  color: var(--text-muted);
+}
+
+.file-name {
+  color: #ccc;
+}
+
+.folder-name {
+  text-shadow: 0 0 5px rgba(0,0,0,0.5);
+}
+
+@media (max-width: 768px) {
+  .terminal-body {
+    font-size: 0.9rem;
+    overflow-x: auto;
+  }
+}
