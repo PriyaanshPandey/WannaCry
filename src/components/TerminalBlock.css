@@ -1,0 +1,64 @@
+.terminal-block {
+  background-color: rgba(5, 5, 5, 0.9);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 255, 157, 0.05);
+  font-family: var(--font-mono);
+  width: 100%;
+  max-width: 500px;
+}
+
+.terminal-header {
+  background-color: var(--color-bg-secondary);
+  border-bottom: 1px solid var(--color-border);
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.terminal-buttons {
+  display: flex;
+  gap: 6px;
+}
+
+.terminal-btn {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.terminal-btn.close { background-color: #ff5f56; }
+.terminal-btn.minimize { background-color: #ffbd2e; }
+.terminal-btn.maximize { background-color: #27c93f; }
+
+.terminal-title {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  color: var(--color-text-muted);
+  font-size: 0.75rem;
+}
+
+.terminal-body {
+  padding: var(--spacing-lg);
+  color: var(--color-text-main);
+  font-size: 0.85rem;
+  line-height: 1.6;
+  min-height: 200px;
+}
+
+.terminal-line {
+  margin-bottom: 4px;
+}
+
+.terminal-prompt {
+  color: var(--color-primary);
+  margin-right: 8px;
+}
+
+.terminal-cursor {
+  color: var(--color-primary);
+  animation: blink 1s step-end infinite;
+}

@@ -1,0 +1,32 @@
+:root {
+  /* Colors */
+  --color-bg: #050505;
+  --color-bg-secondary: #121212;
+  --color-bg-tertiary: #1e1e1e;
+  --color-primary: #00ff9d;
+  --color-primary-glow: rgba(0, 255, 157, 0.3);
+  --color-secondary: #00e5ff;
+  --color-text-main: #f0f0f0;
+  --color-text-muted: #888888;
+  --color-border: #333333;
+  --color-border-glow: #00ff9d55;
+  
+  /* Typography */
+  --font-main: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+  
+  /* Spacing */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-2xl: 3rem;
+  
+  /* Effects */
+  --transition-fast: 0.15s ease-out;
+  --transition-normal: 0.3s ease-out;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+}
