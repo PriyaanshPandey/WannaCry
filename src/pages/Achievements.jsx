@@ -5,12 +5,10 @@ import {
   Sparkles, 
   Code2, 
   Trophy, 
-  Award,
-  Zap,
-  Flame,
-  Radio,
-  ExternalLink,
-  Crown
+  Award, 
+  Zap, 
+  Crown,
+  Flame
 } from 'lucide-react';
 import { achievements, timelineMilestones } from '../data/achievements';
 import { teamMembers } from '../data/team';
@@ -27,11 +25,119 @@ const CATEGORY_MAP = {
 };
 
 // ==========================================
-// 1. CINEMATIC INTRO COMPONENT
+// 1. CYBER CONSTELLATION BACKGROUND CANVAS
+// ==========================================
+const CyberConstellation = () => {
+  const canvasRef = useRef(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    let animationFrameId;
+    let width = (canvas.width = window.innerWidth);
+    let height = (canvas.height = window.innerHeight);
+
+    const handleResize = () => {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+    };
+    window.addEventListener('resize', handleResize);
+
+    // Particle nodes
+    const particleCount = Math.min(Math.floor(width / 35), 45);
+    const particles = Array.from({ length: particleCount }, () => ({
+      x: Math.random() * width,
+      y: Math.random() * height,
+      vx: (Math.random() - 0.5) * 0.4,
+      vy: (Math.random() - 0.5) * 0.4,
+      radius: Math.random() * 1.5 + 0.8,
+      color: Math.random() > 0.5 ? '#00FF88' : '#00E5FF'
+    }));
+
+    let mouseX = -1000;
+    let mouseY = -1000;
+
+    const handleMouseMove = (e) => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+    };
+    window.addEventListener('pointermove', handleMouseMove);
+
+    const render = () => {
+      ctx.clearRect(0, 0, width, height);
+
+      // Draw and connect particles
+      for (let i = 0; i < particles.length; i++) {
+        const p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+
+        if (p.x < 0) p.x = width;
+        if (p.x > width) p.x = 0;
+        if (p.y < 0) p.y = height;
+        if (p.y > height) p.y = 0;
+
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fillStyle = p.color;
+        ctx.shadowBlur = 8;
+        ctx.shadowColor = p.color;
+        ctx.fill();
+        ctx.shadowBlur = 0;
+
+        // Connect near particles
+        for (let j = i + 1; j < particles.length; j++) {
+          const p2 = particles[j];
+          const dx = p.x - p2.x;
+          const dy = p.y - p2.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+
+          if (dist < 120) {
+            ctx.beginPath();
+            ctx.moveTo(p.x, p.y);
+            ctx.lineTo(p2.x, p2.y);
+            ctx.strokeStyle = `rgba(0, 255, 136, ${0.12 * (1 - dist / 120)})`;
+            ctx.lineWidth = 0.6;
+            ctx.stroke();
+          }
+        }
+
+        // Connect with mouse cursor
+        const mdx = p.x - mouseX;
+        const mdy = p.y - mouseY;
+        const mdist = Math.sqrt(mdx * mdx + mdy * mdy);
+        if (mdist < 160) {
+          ctx.beginPath();
+          ctx.moveTo(p.x, p.y);
+          ctx.lineTo(mouseX, mouseY);
+          ctx.strokeStyle = `rgba(0, 229, 255, ${0.25 * (1 - mdist / 160)})`;
+          ctx.lineWidth = 0.8;
+          ctx.stroke();
+        }
+      }
+
+      animationFrameId = requestAnimationFrame(render);
+    };
+
+    render();
+
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('pointermove', handleMouseMove);
+    };
+  }, []);
+
+  return <canvas ref={canvasRef} className="cyber-constellation-canvas" aria-hidden="true" />;
+};
+
+// ==========================================
+// 2. CINEMATIC INTRO COMPONENT
 // ==========================================
 const CinematicIntro = ({ onComplete }) => {
   const [introText, setIntroText] = useState('W');
-  const [phase, setPhase] = useState('typing'); // typing | reveal | exit
+  const [phase, setPhase] = useState('typing');
 
   useEffect(() => {
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -80,25 +186,46 @@ const CinematicIntro = ({ onComplete }) => {
 };
 
 // ==========================================
-// 2. MODERN HOLOGRAPHIC ACHIEVEMENT CARD
+// 3. ENHANCED HOLOGRAPHIC 3D CARD
 // ==========================================
 const ModernAchievementCard = ({ item, index, isFeatured = false, onHoverChange }) => {
   const cardRef = useRef(null);
-  const [mousePos, setMousePos] = useState({ x: 50, y: 50 });
+  const [tilt, setTilt] = useState({ x: 0, y: 0, mouseX: 50, mouseY: 50 });
   const [isHovered, setIsHovered] = useState(false);
 
   const handleMouseMove = useCallback((e) => {
     if (!cardRef.current) return;
     const rect = cardRef.current.getBoundingClientRect();
-    const x = ((e.clientX - rect.left) / rect.width) * 100;
-    const y = ((e.clientY - rect.top) / rect.height) * 100;
-    setMousePos({ x, y });
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    
+    const mouseX = (x / rect.width) * 100;
+    const mouseY = (y / rect.height) * 100;
+
+    // 3D Tilt calculation (-7deg to +7deg)
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+    const rotateX = ((y - centerY) / centerY) * -7;
+    const rotateY = ((x - centerX) / centerX) * 7;
+
+    setTilt({ x: rotateX, y: rotateY, mouseX, mouseY });
   }, []);
+
+  const handleMouseEnter = () => {
+    setIsHovered(true);
+    onHoverChange('VIEW');
+  };
+
+  const handleMouseLeave = () => {
+    setIsHovered(false);
+    setTilt({ x: 0, y: 0, mouseX: 50, mouseY: 50 });
+    onHoverChange('DEFAULT');
+  };
 
   const categoryInfo = CATEGORY_MAP[item.category] || {
     icon: Flame,
     color: '#00FF88',
-    glow: 'rgba(0, 255, 136, 0.2)',
+    glow: 'rgba(0, 255, 136, 0.25)',
     label: item.category.toUpperCase()
   };
   const CategoryIcon = categoryInfo.icon;
@@ -108,27 +235,23 @@ const ModernAchievementCard = ({ item, index, isFeatured = false, onHoverChange 
       ref={cardRef}
       className={`holo-achievement-card ${isFeatured ? 'featured-card' : ''} ${isHovered ? 'hovered' : ''}`}
       onMouseMove={handleMouseMove}
-      onMouseEnter={() => {
-        setIsHovered(true);
-        onHoverChange('VIEW');
-      }}
-      onMouseLeave={() => {
-        setIsHovered(false);
-        setMousePos({ x: 50, y: 50 });
-        onHoverChange('DEFAULT');
-      }}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
       style={{
-        '--card-mouse-x': `${mousePos.x}%`,
-        '--card-mouse-y': `${mousePos.y}%`,
+        transform: `perspective(1000px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)`,
+        '--card-mouse-x': `${tilt.mouseX}%`,
+        '--card-mouse-y': `${tilt.mouseY}%`,
         '--accent-color': categoryInfo.color,
         '--accent-glow': categoryInfo.glow,
         animationDelay: `${0.05 * (index + 1)}s`
       }}
     >
-      {/* Specular Light & Ambient Gradient Mesh */}
+      {/* Animated Glowing Laser Border Trace & Foil Sheen */}
+      <div className="card-border-tracer" aria-hidden="true"></div>
+      <div className="card-foil-sheen" aria-hidden="true"></div>
       <div className="card-ambient-glow" aria-hidden="true"></div>
-      <div className="card-specular-highlight" aria-hidden="true"></div>
       <div className="card-laser-edge" aria-hidden="true"></div>
+      <div className="card-scanline-laser" aria-hidden="true"></div>
 
       {/* Card Content Layout */}
       <div className="card-inner-content">
@@ -136,7 +259,7 @@ const ModernAchievementCard = ({ item, index, isFeatured = false, onHoverChange 
         <div className="card-top-row">
           <div className="card-emblem-cluster">
             <div className="category-emblem" style={{ color: categoryInfo.color }}>
-              {isFeatured ? <Crown size={15} /> : <CategoryIcon size={14} />}
+              {isFeatured ? <Crown size={15} className="crown-glow-anim" /> : <CategoryIcon size={14} />}
             </div>
             <span className="category-pill-name">{categoryInfo.label}</span>
           </div>
@@ -150,14 +273,19 @@ const ModernAchievementCard = ({ item, index, isFeatured = false, onHoverChange 
         {/* Headline & Impact Info */}
         <div className="card-main-info">
           <div className="status-badge-row">
-            <span className="live-beacon"></span>
+            <span className="live-beacon">
+              <span className="beacon-core"></span>
+              <span className="beacon-wave"></span>
+            </span>
             <span className="result-text">{item.result || item.level}</span>
           </div>
 
-          <h3 className="card-main-title">{item.title}</h3>
+          <h3 className="card-main-title glitch-hover-title" data-text={item.title}>
+            {item.title}
+          </h3>
           <p className="card-main-headline">{item.headline}</p>
 
-          {/* Minimalist Technology / Focus Tags */}
+          {/* Minimalist Technology Tags */}
           {item.tags && (
             <div className="card-tags-flow">
               {item.tags.map((tag, tIdx) => (
@@ -203,7 +331,7 @@ const ModernAchievementCard = ({ item, index, isFeatured = false, onHoverChange 
 };
 
 // ==========================================
-// 3. STATS NUMBER COUNTER COMPONENT
+// 4. STATS NUMBER COUNTER COMPONENT
 // ==========================================
 const StatCounter = ({ endValue, label, suffix = '' }) => {
   const [count, setCount] = useState(0);
@@ -333,7 +461,14 @@ const Achievements = () => {
       {/* 1. Cinematic Intro Overlay */}
       {!introFinished && <CinematicIntro onComplete={handleIntroComplete} />}
 
-      {/* 2. Custom Desktop Cursor */}
+      {/* 2. Interactive Background Cyber Constellation & Ambient Beams */}
+      <CyberConstellation />
+      <div className="technical-grid-bg" aria-hidden="true">
+        <div className="ambient-beam beam-1"></div>
+        <div className="ambient-beam beam-2"></div>
+      </div>
+
+      {/* 3. Custom Desktop Cursor */}
       <div 
         className={`custom-cursor ${cursorData.visible ? 'visible' : ''} cursor-${cursorData.label.toLowerCase()}`}
         style={{
@@ -347,15 +482,9 @@ const Achievements = () => {
         )}
       </div>
 
-      {/* Technical Background Grid & Ambient Atmosphere */}
-      <div className="technical-grid-bg" aria-hidden="true">
-        <div className="ambient-beam beam-1"></div>
-        <div className="ambient-beam beam-2"></div>
-      </div>
-
       <div className="content-container">
         {/* ==========================================
-            3. HERO SECTION (EDITORIAL & SPACIOUS)
+            4. HERO SECTION (EDITORIAL & SPACIOUS)
             ========================================== */}
         <section className="editorial-hero">
           <div className="hero-top-eyebrow">
@@ -363,7 +492,7 @@ const Achievements = () => {
             <span className="hero-tagline">// WANNACRY REPOSITORY</span>
           </div>
 
-          <h1 className="hero-monolith-title">
+          <h1 className="hero-monolith-title kinetic-title">
             ACHIEVEMENTS
           </h1>
 
@@ -383,7 +512,7 @@ const Achievements = () => {
         </section>
 
         {/* ==========================================
-            4. INTERACTIVE TEAM IDENTITIES (SPATIAL)
+            5. INTERACTIVE TEAM IDENTITIES (SPATIAL)
             ========================================== */}
         <section className="spatial-team-section">
           <div className="section-eyebrow">
@@ -435,7 +564,7 @@ const Achievements = () => {
         </section>
 
         {/* ==========================================
-            5. ACHIEVEMENT STATISTICS (MONUMENTAL)
+            6. ACHIEVEMENT STATISTICS (MONUMENTAL)
             ========================================== */}
         <section className="monumental-stats-section">
           <div className="stats-grid">
@@ -447,7 +576,7 @@ const Achievements = () => {
         </section>
 
         {/* ==========================================
-            6. LIQUID FILTER BAR & ARTISTIC SHOWCASE
+            7. LIQUID FILTER BAR & ARTISTIC SHOWCASE
             ========================================== */}
         <section className="achievements-gallery-section" id="achievements-gallery">
           <div className="gallery-header-bar">
@@ -513,7 +642,7 @@ const Achievements = () => {
         </section>
 
         {/* ==========================================
-            7. TIMELINE STORYTELLING SECTION
+            8. TIMELINE STORYTELLING SECTION
             ========================================== */}
         <section className="timeline-story-section">
           <div className="section-eyebrow">
@@ -543,7 +672,7 @@ const Achievements = () => {
         </section>
 
         {/* ==========================================
-            8. WANNACRY DNA / KINETIC TYPOGRAPHY
+            9. WANNACRY DNA / KINETIC TYPOGRAPHY
             ========================================== */}
         <section className="dna-kinetic-section">
           <div className="dna-eyebrow">OUR DNA</div>
@@ -556,7 +685,7 @@ const Achievements = () => {
         </section>
 
         {/* ==========================================
-            9. FINAL CINEMATIC CTA
+            10. FINAL CINEMATIC CTA
             ========================================== */}
         <section className="cinematic-footer-cta">
           <div className="cta-ambient-glow"></div>
