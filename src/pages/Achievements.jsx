@@ -1,249 +1,590 @@
-import { useState, useMemo } from 'react';
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { 
-  Trophy, 
-  Award, 
-  Code, 
-  Zap, 
+  ArrowUpRight, 
+  ChevronDown, 
   Sparkles, 
-  Calendar, 
-  CheckCircle2, 
-  Users, 
-  Terminal,
-  Filter
+  Code2, 
+  Trophy, 
+  Award,
+  Zap,
+  Flame,
+  Radio,
+  ExternalLink,
+  Crown
 } from 'lucide-react';
-import { achievements } from '../data/achievements';
+import { achievements, timelineMilestones } from '../data/achievements';
+import { teamMembers } from '../data/team';
 import './Achievements.css';
 
-// Category theme mapping with icons and neon hues
+const FILTER_OPTIONS = ['ALL', 'PRIYAANSH', 'PRANJAL', 'KRISHNA'];
+
 const CATEGORY_MAP = {
-  Hackathon: {
-    icon: Trophy,
-    className: 'badge-hackathon',
-    label: 'HACKATHON'
-  },
-  Project: {
-    icon: Code,
-    className: 'badge-project',
-    label: 'PROJECT'
-  },
-  Certification: {
-    icon: Award,
-    className: 'badge-certification',
-    label: 'CERTIFICATION'
-  },
-  Competition: {
-    icon: Zap,
-    className: 'badge-competition',
-    label: 'COMPETITION'
-  },
-  Research: {
-    icon: Sparkles,
-    className: 'badge-research',
-    label: 'RESEARCH'
-  }
+  Hackathon: { icon: Trophy, color: '#00FF88', glow: 'rgba(0, 255, 136, 0.25)', label: 'HACKATHON' },
+  Project: { icon: Code2, color: '#00E5FF', glow: 'rgba(0, 229, 255, 0.25)', label: 'PROJECT' },
+  Certification: { icon: Award, color: '#C084FC', glow: 'rgba(192, 132, 252, 0.25)', label: 'CERTIFICATION' },
+  Competition: { icon: Zap, color: '#FBBF24', glow: 'rgba(251, 191, 36, 0.25)', label: 'COMPETITION' },
+  Research: { icon: Sparkles, color: '#00FF88', glow: 'rgba(0, 255, 136, 0.25)', label: 'RESEARCH' }
 };
 
-// Distinct styling per team member for avatar pills
-const MEMBER_STYLES = {
-  Priyaansh: {
-    initial: 'P',
-    className: 'avatar-priyaansh'
-  },
-  Pranjal: {
-    initial: 'P',
-    className: 'avatar-pranjal'
-  },
-  Krishna: {
-    initial: 'K',
-    className: 'avatar-krishna'
-  }
-};
+// ==========================================
+// 1. CINEMATIC INTRO COMPONENT
+// ==========================================
+const CinematicIntro = ({ onComplete }) => {
+  const [introText, setIntroText] = useState('W');
+  const [phase, setPhase] = useState('typing'); // typing | reveal | exit
 
-const FILTER_OPTIONS = ['All', 'Priyaansh', 'Pranjal', 'Krishna'];
+  useEffect(() => {
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReducedMotion) {
+      onComplete();
+      return;
+    }
 
-const Achievements = () => {
-  const [activeFilter, setActiveFilter] = useState('All');
+    const steps = ['W', 'WA', 'WAN', 'WANNA', 'WANNACRY'];
+    let stepIndex = 0;
 
-  // Filtered achievements based on selected team member
-  const filteredAchievements = useMemo(() => {
-    if (activeFilter === 'All') return achievements;
-    return achievements.filter(item => 
-      item.members && item.members.includes(activeFilter)
-    );
-  }, [activeFilter]);
+    const interval = setInterval(() => {
+      stepIndex++;
+      if (stepIndex < steps.length) {
+        setIntroText(steps[stepIndex]);
+      } else {
+        clearInterval(interval);
+        setPhase('reveal');
+        setTimeout(() => {
+          setPhase('exit');
+          setTimeout(onComplete, 400);
+        }, 600);
+      }
+    }, 110);
 
-  // Counts for each filter button
-  const filterCounts = useMemo(() => {
-    const counts = { All: achievements.length };
-    FILTER_OPTIONS.slice(1).forEach(name => {
-      counts[name] = achievements.filter(
-        item => item.members && item.members.includes(name)
-      ).length;
-    });
-    return counts;
-  }, []);
+    return () => clearInterval(interval);
+  }, [onComplete]);
 
-  const getCategoryDetails = (category) => {
-    return CATEGORY_MAP[category] || {
-      icon: Trophy,
-      className: 'badge-default',
-      label: (category || 'MILESTONE').toUpperCase()
-    };
-  };
-
-  const getMemberStyle = (name) => {
-    return MEMBER_STYLES[name] || {
-      initial: name ? name.charAt(0).toUpperCase() : '?',
-      className: 'avatar-default'
-    };
-  };
+  if (phase === 'done') return null;
 
   return (
-    <div className="achievements-page">
-      {/* Faint ambient depth glow orbs breaking up flat grid */}
-      <div className="ambient-orb orb-primary" aria-hidden="true"></div>
-      <div className="ambient-orb orb-secondary" aria-hidden="true"></div>
-
-      <section className="container achievements-container">
-        {/* Page Header */}
-        <div className="page-header animate-fade-in">
-          <div className="header-badge">
-            <Terminal size={14} />
-            <span>SYSTEM.LOGS // RECORDED_WINS</span>
+    <div className={`cinematic-intro ${phase}`}>
+      <div className="intro-content">
+        {phase === 'typing' ? (
+          <h1 className="intro-glitch-text">{introText}</h1>
+        ) : (
+          <div className="intro-reveal-box">
+            <span className="intro-brand">WANNACRY®</span>
+            <h1 className="intro-sub">ACHIEVEMENTS</h1>
           </div>
-          <h1 className="page-title">OUR ACHIEVEMENTS</h1>
-          <p className="page-subtitle">
-            The work.<br />
-            The challenges.<br />
-            <span className="highlight">The milestones.</span>
-          </p>
-        </div>
+        )}
+      </div>
+      <div className="intro-scanline"></div>
+    </div>
+  );
+};
 
-        {/* Interactive Team Filter Bar */}
-        <div className="filter-wrapper animate-fade-in delay-1">
-          <div className="filter-label">
-            <Filter size={14} />
-            <span>FILTER_BY_OPERATOR:</span>
-          </div>
-          <div className="filter-bar" role="tablist" aria-label="Filter achievements by team member">
-            {FILTER_OPTIONS.map((filter) => {
-              const isActive = activeFilter === filter;
-              const count = filterCounts[filter] || 0;
-              return (
-                <button
-                  key={filter}
-                  role="tab"
-                  aria-selected={isActive}
-                  className={`filter-btn ${isActive ? 'active' : ''}`}
-                  onClick={() => setActiveFilter(filter)}
-                >
-                  <span className="filter-text">{filter.toUpperCase()}</span>
-                  <span className="filter-count">[{count < 10 ? `0${count}` : count}]</span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
+// ==========================================
+// 2. MODERN HOLOGRAPHIC ACHIEVEMENT CARD
+// ==========================================
+const ModernAchievementCard = ({ item, index, isFeatured = false, onHoverChange }) => {
+  const cardRef = useRef(null);
+  const [mousePos, setMousePos] = useState({ x: 50, y: 50 });
+  const [isHovered, setIsHovered] = useState(false);
 
-        {/* Achievements Grid */}
-        <div 
-          key={activeFilter} 
-          className="achievements-grid-wrapper animate-fade-in delay-2"
-        >
-          {filteredAchievements.length === 0 ? (
-            <div className="no-achievements animate-fade-in">
-              <div className="terminal-header">
-                <span className="terminal-dot red"></span>
-                <span className="terminal-dot yellow"></span>
-                <span className="terminal-dot green"></span>
-                <span className="terminal-title">query_status.sh</span>
-              </div>
-              <div className="terminal-body">
-                <div className="terminal-line prompt">
-                  {`> system.query("achievements", { member: "${activeFilter}" })`}
-                </div>
-                <div className="terminal-line error">
-                  [!] 0 records found for operator "{activeFilter}". Status: STANDBY_OR_BUILDING.
-                </div>
-                <button 
-                  className="terminal-reset-btn"
-                  onClick={() => setActiveFilter('All')}
-                >
-                  [ RESET FILTER TO ALL ]
-                </button>
-              </div>
+  const handleMouseMove = useCallback((e) => {
+    if (!cardRef.current) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
+    setMousePos({ x, y });
+  }, []);
+
+  const categoryInfo = CATEGORY_MAP[item.category] || {
+    icon: Flame,
+    color: '#00FF88',
+    glow: 'rgba(0, 255, 136, 0.2)',
+    label: item.category.toUpperCase()
+  };
+  const CategoryIcon = categoryInfo.icon;
+
+  return (
+    <article
+      ref={cardRef}
+      className={`holo-achievement-card ${isFeatured ? 'featured-card' : ''} ${isHovered ? 'hovered' : ''}`}
+      onMouseMove={handleMouseMove}
+      onMouseEnter={() => {
+        setIsHovered(true);
+        onHoverChange('VIEW');
+      }}
+      onMouseLeave={() => {
+        setIsHovered(false);
+        setMousePos({ x: 50, y: 50 });
+        onHoverChange('DEFAULT');
+      }}
+      style={{
+        '--card-mouse-x': `${mousePos.x}%`,
+        '--card-mouse-y': `${mousePos.y}%`,
+        '--accent-color': categoryInfo.color,
+        '--accent-glow': categoryInfo.glow,
+        animationDelay: `${0.05 * (index + 1)}s`
+      }}
+    >
+      {/* Specular Light & Ambient Gradient Mesh */}
+      <div className="card-ambient-glow" aria-hidden="true"></div>
+      <div className="card-specular-highlight" aria-hidden="true"></div>
+      <div className="card-laser-edge" aria-hidden="true"></div>
+
+      {/* Card Content Layout */}
+      <div className="card-inner-content">
+        {/* Top Bar: Emblem + Category + Year */}
+        <div className="card-top-row">
+          <div className="card-emblem-cluster">
+            <div className="category-emblem" style={{ color: categoryInfo.color }}>
+              {isFeatured ? <Crown size={15} /> : <CategoryIcon size={14} />}
             </div>
-          ) : (
-            <div className="achievements-grid">
-              {filteredAchievements.map((achievement, index) => {
-                const categoryData = getCategoryDetails(achievement.category);
-                const CategoryIcon = categoryData.icon;
+            <span className="category-pill-name">{categoryInfo.label}</span>
+          </div>
 
-                return (
-                  <article 
-                    key={achievement.id} 
-                    className="achievement-card"
-                    style={{ animationDelay: `${0.05 * (index + 1)}s` }}
-                  >
-                    {/* Card Top Meta Header */}
-                    <div className="achievement-meta">
-                      <div className="achievement-year">
-                        <Calendar size={13} />
-                        <span>{achievement.year}</span>
-                      </div>
-                      <div className={`achievement-badge ${categoryData.className}`}>
-                        <CategoryIcon size={12} />
-                        <span>{categoryData.label}</span>
-                      </div>
-                    </div>
+          <div className="card-top-meta">
+            <span className="meta-year">{item.year}</span>
+            <span className="meta-num">{item.num || `0${index + 1}`}</span>
+          </div>
+        </div>
 
-                    {/* Card Main Content */}
-                    <div className="achievement-content">
-                      <h2 className="achievement-title">{achievement.title}</h2>
-                      <p className="achievement-desc">{achievement.description}</p>
-                    </div>
+        {/* Headline & Impact Info */}
+        <div className="card-main-info">
+          <div className="status-badge-row">
+            <span className="live-beacon"></span>
+            <span className="result-text">{item.result || item.level}</span>
+          </div>
 
-                    {/* Card Footer: Result + Team Avatar Pills */}
-                    <div className="achievement-footer">
-                      <div className="achievement-result-box">
-                        <span className="result-label">RESULT:</span>
-                        <div className="result-value">
-                          <CheckCircle2 size={14} className="result-icon" />
-                          <span>{achievement.result}</span>
-                        </div>
-                      </div>
+          <h3 className="card-main-title">{item.title}</h3>
+          <p className="card-main-headline">{item.headline}</p>
 
-                      <div className="achievement-team-section">
-                        <div className="team-section-label">
-                          <Users size={12} />
-                          <span>TEAM:</span>
-                        </div>
-                        <div className="achievement-team-pills">
-                          {achievement.members.map((member, idx) => {
-                            const memberInfo = getMemberStyle(member);
-                            return (
-                              <div 
-                                key={idx} 
-                                className={`team-avatar-pill ${memberInfo.className}`}
-                                title={`Team Member: ${member}`}
-                              >
-                                <span className="avatar-circle">
-                                  {memberInfo.initial}
-                                </span>
-                                <span className="avatar-name">{member}</span>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    </div>
-                  </article>
-                );
-              })}
+          {/* Minimalist Technology / Focus Tags */}
+          {item.tags && (
+            <div className="card-tags-flow">
+              {item.tags.map((tag, tIdx) => (
+                <span key={tIdx} className="modern-tag-pill">
+                  {tag}
+                </span>
+              ))}
             </div>
           )}
         </div>
-      </section>
+
+        {/* Footer: Operator Avatars + Magnetic Action Link */}
+        <div className="card-bottom-row">
+          <div className="operators-cluster">
+            <span className="operators-label">OPERATORS:</span>
+            <div className="operators-pill-group">
+              {item.members.map((member, mIdx) => (
+                <div 
+                  key={mIdx} 
+                  className={`operator-chip chip-${member.toLowerCase()}`}
+                  title={`Operator: ${member}`}
+                >
+                  <span className="chip-avatar-dot"></span>
+                  <span className="chip-name">{member}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <a 
+            href={item.link || 'https://github.com/PriyaanshPandey/WannaCry'} 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="action-magnetic-btn"
+            aria-label={`View details for ${item.title}`}
+          >
+            <ArrowUpRight size={15} />
+          </a>
+        </div>
+      </div>
+    </article>
+  );
+};
+
+// ==========================================
+// 3. STATS NUMBER COUNTER COMPONENT
+// ==========================================
+const StatCounter = ({ endValue, label, suffix = '' }) => {
+  const [count, setCount] = useState(0);
+  const [hasAnimated, setHasAnimated] = useState(false);
+  const ref = useRef(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting && !hasAnimated) {
+        setHasAnimated(true);
+        let start = 0;
+        const duration = 1200;
+        const startTime = performance.now();
+
+        const animate = (now) => {
+          const elapsed = now - startTime;
+          const progress = Math.min(elapsed / duration, 1);
+          const easeOut = 1 - Math.pow(1 - progress, 3);
+          const current = Math.floor(easeOut * endValue);
+          setCount(current);
+
+          if (progress < 1) {
+            requestAnimationFrame(animate);
+          } else {
+            setCount(endValue);
+          }
+        };
+        requestAnimationFrame(animate);
+      }
+    }, { threshold: 0.3 });
+
+    if (ref.current) observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, [endValue, hasAnimated]);
+
+  return (
+    <div ref={ref} className="stat-item">
+      <div className="stat-number">
+        {count < 10 && !suffix ? `0${count}` : count}{suffix}
+      </div>
+      <div className="stat-label">{label}</div>
+    </div>
+  );
+};
+
+// ==========================================
+// MAIN ACHIEVEMENTS PAGE COMPONENT
+// ==========================================
+const Achievements = () => {
+  const [introFinished, setIntroFinished] = useState(() => {
+    return Boolean(sessionStorage.getItem('wc_intro_seen'));
+  });
+  const [activeFilter, setActiveFilter] = useState('ALL');
+  const [hoveredMember, setHoveredMember] = useState(null);
+  const [cursorData, setCursorData] = useState({ x: -100, y: -100, label: 'DEFAULT', visible: false });
+
+  const filterBarRef = useRef(null);
+  const [pillStyle, setPillStyle] = useState({ left: 0, width: 0 });
+
+  const handleIntroComplete = useCallback(() => {
+    sessionStorage.setItem('wc_intro_seen', 'true');
+    setIntroFinished(true);
+  }, []);
+
+  // Filtered achievements
+  const filteredAchievements = useMemo(() => {
+    if (activeFilter === 'ALL') return achievements;
+    return achievements.filter(item => 
+      item.members.some(m => m.toUpperCase() === activeFilter)
+    );
+  }, [activeFilter]);
+
+  // Update sliding glass indicator on active filter change
+  useEffect(() => {
+    if (!filterBarRef.current) return;
+    const activeBtn = filterBarRef.current.querySelector('.filter-tab.active');
+    if (activeBtn) {
+      setPillStyle({
+        left: activeBtn.offsetLeft,
+        width: activeBtn.offsetWidth
+      });
+    }
+  }, [activeFilter, introFinished]);
+
+  // Smooth custom cursor tracking
+  useEffect(() => {
+    const handlePointerMove = (e) => {
+      setCursorData(prev => ({
+        ...prev,
+        x: e.clientX,
+        y: e.clientY,
+        visible: true
+      }));
+    };
+
+    const handlePointerLeave = () => {
+      setCursorData(prev => ({ ...prev, visible: false }));
+    };
+
+    window.addEventListener('pointermove', handlePointerMove);
+    document.addEventListener('mouseleave', handlePointerLeave);
+    return () => {
+      window.removeEventListener('pointermove', handlePointerMove);
+      document.removeEventListener('mouseleave', handlePointerLeave);
+    };
+  }, []);
+
+  const handleCursorLabel = (label) => {
+    setCursorData(prev => ({ ...prev, label }));
+  };
+
+  const getMemberAchievementCount = (name) => {
+    return achievements.filter(item => item.members.includes(name)).length;
+  };
+
+  // Identify featured champion item
+  const featuredItem = useMemo(() => {
+    return filteredAchievements.find(a => a.category === 'Hackathon') || filteredAchievements[0];
+  }, [filteredAchievements]);
+
+  const regularItems = useMemo(() => {
+    return filteredAchievements.filter(a => a.id !== (featuredItem ? featuredItem.id : null));
+  }, [filteredAchievements, featuredItem]);
+
+  return (
+    <div className="awwwards-achievements-page">
+      {/* 1. Cinematic Intro Overlay */}
+      {!introFinished && <CinematicIntro onComplete={handleIntroComplete} />}
+
+      {/* 2. Custom Desktop Cursor */}
+      <div 
+        className={`custom-cursor ${cursorData.visible ? 'visible' : ''} cursor-${cursorData.label.toLowerCase()}`}
+        style={{
+          transform: `translate3d(${cursorData.x}px, ${cursorData.y}px, 0)`
+        }}
+        aria-hidden="true"
+      >
+        <div className="cursor-dot"></div>
+        {cursorData.label !== 'DEFAULT' && (
+          <span className="cursor-badge">{cursorData.label}</span>
+        )}
+      </div>
+
+      {/* Technical Background Grid & Ambient Atmosphere */}
+      <div className="technical-grid-bg" aria-hidden="true">
+        <div className="ambient-beam beam-1"></div>
+        <div className="ambient-beam beam-2"></div>
+      </div>
+
+      <div className="content-container">
+        {/* ==========================================
+            3. HERO SECTION (EDITORIAL & SPACIOUS)
+            ========================================== */}
+        <section className="editorial-hero">
+          <div className="hero-top-eyebrow">
+            <span className="hero-index">03</span>
+            <span className="hero-tagline">// WANNACRY REPOSITORY</span>
+          </div>
+
+          <h1 className="hero-monolith-title">
+            ACHIEVEMENTS
+          </h1>
+
+          <div className="hero-statement">
+            <p className="statement-sub">
+              BUILT DIFFERENTLY.
+            </p>
+            <p className="statement-desc">
+              We do not just hold certificates. We design, break, model, and dominate real-world engineering arenas.
+            </p>
+          </div>
+
+          <div className="hero-scroll-indicator">
+            <span className="scroll-text">EXPLORE RECORDED WINS</span>
+            <ChevronDown size={14} className="scroll-arrow" />
+          </div>
+        </section>
+
+        {/* ==========================================
+            4. INTERACTIVE TEAM IDENTITIES (SPATIAL)
+            ========================================== */}
+        <section className="spatial-team-section">
+          <div className="section-eyebrow">
+            <span>[ 01 // CORE OPERATORS ]</span>
+          </div>
+          
+          <div className="spatial-team-canvas">
+            {teamMembers.map((member) => {
+              const isHovered = hoveredMember === member.name;
+              const isDimmed = hoveredMember && !isHovered;
+              const count = getMemberAchievementCount(member.name);
+              const isActiveInFilter = activeFilter === member.name.toUpperCase();
+
+              return (
+                <div
+                  key={member.id}
+                  className={`floating-identity-pill pill-${member.id} ${isHovered ? 'active' : ''} ${isDimmed ? 'dimmed' : ''} ${isActiveInFilter ? 'selected' : ''}`}
+                  onMouseEnter={() => {
+                    setHoveredMember(member.name);
+                    handleCursorLabel('OPERATOR');
+                  }}
+                  onMouseLeave={() => {
+                    setHoveredMember(null);
+                    handleCursorLabel('DEFAULT');
+                  }}
+                  onClick={() => {
+                    setActiveFilter(member.name.toUpperCase());
+                  }}
+                  role="button"
+                  tabIndex={0}
+                  aria-label={`Filter achievements by ${member.name}`}
+                >
+                  <div className="identity-avatar">
+                    <span className="avatar-initial">{member.name.charAt(0)}</span>
+                    <span className="identity-pulse-ring"></span>
+                  </div>
+                  
+                  <div className="identity-details">
+                    <div className="identity-name-row">
+                      <span className="identity-name">{member.name}</span>
+                      <span className="identity-count">[{count < 10 ? `0${count}` : count} WINS]</span>
+                    </div>
+                    <span className="identity-role">{member.role.split('•')[0]}</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+
+        {/* ==========================================
+            5. ACHIEVEMENT STATISTICS (MONUMENTAL)
+            ========================================== */}
+        <section className="monumental-stats-section">
+          <div className="stats-grid">
+            <StatCounter endValue={achievements.length} label="ACHIEVEMENTS" />
+            <StatCounter endValue={3} label="MINDS" />
+            <StatCounter endValue={1} label="SYNCHRONIZED TEAM" />
+            <StatCounter endValue={100} label="PRODUCTION QUALITY" suffix="%" />
+          </div>
+        </section>
+
+        {/* ==========================================
+            6. LIQUID FILTER BAR & ARTISTIC SHOWCASE
+            ========================================== */}
+        <section className="achievements-gallery-section" id="achievements-gallery">
+          <div className="gallery-header-bar">
+            <div className="gallery-title-box">
+              <span className="section-num">[ 02 // MILESTONES ]</span>
+              <h2 className="gallery-heading">RECORDED WINS</h2>
+            </div>
+
+            {/* Liquid Sliding Filter Bar */}
+            <div className="liquid-filter-wrapper" ref={filterBarRef}>
+              <div 
+                className="liquid-sliding-pill" 
+                style={{ 
+                  transform: `translateX(${pillStyle.left}px)`,
+                  width: `${pillStyle.width}px` 
+                }}
+                aria-hidden="true"
+              />
+              {FILTER_OPTIONS.map((filter) => {
+                const isActive = activeFilter === filter;
+                return (
+                  <button
+                    key={filter}
+                    className={`filter-tab ${isActive ? 'active' : ''}`}
+                    onClick={() => setActiveFilter(filter)}
+                    onMouseEnter={() => handleCursorLabel('FILTER')}
+                    onMouseLeave={() => handleCursorLabel('DEFAULT')}
+                  >
+                    {filter}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Dynamic Showcase Layout (Hero Spotlight + Asymmetric Holographic Stream) */}
+          <div className="achievements-showcase-layout">
+            {/* Featured Hero Highlight Card */}
+            {featuredItem && (
+              <div className="showcase-featured-slot">
+                <ModernAchievementCard 
+                  item={featuredItem} 
+                  index={0} 
+                  isFeatured={true}
+                  onHoverChange={handleCursorLabel}
+                />
+              </div>
+            )}
+
+            {/* Secondary Stream Grid */}
+            <div className="showcase-stream-grid">
+              {regularItems.map((item, index) => (
+                <ModernAchievementCard 
+                  key={item.id} 
+                  item={item} 
+                  index={index + 1} 
+                  isFeatured={false}
+                  onHoverChange={handleCursorLabel}
+                />
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ==========================================
+            7. TIMELINE STORYTELLING SECTION
+            ========================================== */}
+        <section className="timeline-story-section">
+          <div className="section-eyebrow">
+            <span>[ 03 // TRAJECTORY ]</span>
+          </div>
+          <h2 className="timeline-section-title">THE EXPEDITION</h2>
+
+          <div className="timeline-track-container">
+            <div className="timeline-line-track"></div>
+            <div className="timeline-nodes">
+              {timelineMilestones.map((m, idx) => (
+                <div key={idx} className="timeline-node">
+                  <div className="node-marker">
+                    <span className="marker-dot"></span>
+                    <span className="marker-ring"></span>
+                  </div>
+                  <div className="node-content">
+                    <span className="node-year">{m.year}</span>
+                    <h3 className="node-stage">{m.stage}</h3>
+                    <p className="node-highlight">{m.highlight}</p>
+                    <span className="node-status">[{m.status}]</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ==========================================
+            8. WANNACRY DNA / KINETIC TYPOGRAPHY
+            ========================================== */}
+        <section className="dna-kinetic-section">
+          <div className="dna-eyebrow">OUR DNA</div>
+          <div className="dna-word-stack">
+            <div className="dna-word" data-word="BUILD.">BUILD.</div>
+            <div className="dna-word" data-word="BREAK.">BREAK.</div>
+            <div className="dna-word" data-word="LEARN.">LEARN.</div>
+            <div className="dna-word" data-word="REPEAT.">REPEAT.</div>
+          </div>
+        </section>
+
+        {/* ==========================================
+            9. FINAL CINEMATIC CTA
+            ========================================== */}
+        <section className="cinematic-footer-cta">
+          <div className="cta-ambient-glow"></div>
+          <div className="cta-content">
+            <span className="cta-status">CURRENT STATE: EXECUTING</span>
+            <h2 className="cta-title">STILL BUILDING.</h2>
+            <div className="cta-team-manifest">
+              <span>PRIYAANSH</span>
+              <span className="bullet">•</span>
+              <span>PRANJAL</span>
+              <span className="bullet">•</span>
+              <span>KRISHNA</span>
+            </div>
+            
+            <a 
+              href="https://github.com/PriyaanshPandey/WannaCry"
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="magnetic-cta-btn"
+              onMouseEnter={() => handleCursorLabel('EXPLORE')}
+              onMouseLeave={() => handleCursorLabel('DEFAULT')}
+            >
+              <span>EXPLORE GITHUB REPOSITORY</span>
+              <ArrowUpRight size={16} />
+            </a>
+          </div>
+        </section>
+      </div>
     </div>
   );
 };
