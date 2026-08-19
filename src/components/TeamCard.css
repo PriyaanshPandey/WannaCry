@@ -1,0 +1,177 @@
+.team-card {
+  position: relative;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-dim);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 8px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  height: 100%;
+}
+
+.team-card:hover {
+  background: var(--bg-panel-hover);
+  border-color: var(--card-accent);
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5), 0 0 10px inset rgba(0,0,0, 0.5);
+}
+
+.card-glitch-border {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--card-accent);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.team-card:hover .card-glitch-border {
+  opacity: 1;
+  animation: border-glitch 2s infinite linear;
+}
+
+@keyframes border-glitch {
+  0% { transform: scaleX(1); transform-origin: left; }
+  50% { transform: scaleX(0.5); transform-origin: left; }
+  50.1% { transform: scaleX(0.5); transform-origin: right; }
+  100% { transform: scaleX(1); transform-origin: right; }
+}
+
+.card-content {
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.avatar-container {
+  margin-bottom: 1.5rem;
+  display: flex;
+  justify-content: center;
+}
+
+.avatar-placeholder {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: #1a1a1a;
+  border: 2px dashed var(--border-dim);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.3s;
+}
+
+.team-card:hover .avatar-placeholder {
+  border-color: var(--card-accent);
+  border-style: solid;
+}
+
+.avatar-initials {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 2.5rem;
+  color: var(--text-muted);
+  transition: color 0.3s, text-shadow 0.3s;
+}
+
+.team-card:hover .avatar-initials {
+  color: var(--card-accent);
+  text-shadow: 0 0 10px var(--card-accent);
+}
+
+.scanline-overlay {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.2));
+  background-size: 100% 4px;
+  z-index: 2;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.team-card:hover .scanline-overlay {
+  opacity: 1;
+}
+
+.member-info {
+  flex-grow: 1;
+  text-align: center;
+}
+
+.member-name {
+  font-size: 1.75rem;
+  margin-bottom: 1rem;
+  color: var(--text-main);
+  min-height: 2.5rem;
+}
+
+.member-roles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+.role-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.75rem;
+  border: 1px solid;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-family: 'JetBrains Mono', monospace;
+  background: rgba(0,0,0,0.3);
+}
+
+.card-action {
+  text-align: center;
+  margin-top: auto;
+}
+
+.access-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 1rem 0;
+  transition: all 0.2s;
+}
+
+.bracket {
+  color: var(--border-dim);
+  margin: 0 0.5rem;
+  transition: color 0.2s;
+}
+
+.cursor-block {
+  display: inline-block;
+  width: 10px;
+  height: 18px;
+  background-color: var(--card-accent);
+  margin-left: 0.5rem;
+  opacity: 0;
+}
+
+.team-card:hover .access-btn {
+  color: var(--text-main);
+}
+
+.team-card:hover .bracket {
+  color: var(--card-accent);
+}
+
+.team-card:hover .cursor-block {
+  animation: blink 1s step-end infinite;
+}

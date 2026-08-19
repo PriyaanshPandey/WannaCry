@@ -65,3 +65,82 @@ button {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--color-primary);
 }
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap');
+
+:root {
+  --neon-green: #00FF41;
+  --neon-cyan: #00FFFF;
+  --neon-magenta: #FF00FF;
+  
+  --bg-dark: #050505;
+  --bg-panel: rgba(15, 15, 15, 0.7);
+  --bg-panel-hover: rgba(25, 25, 25, 0.9);
+  
+  --text-main: #e0e0e0;
+  --text-muted: #888;
+  
+  --border-dim: #333;
+  
+  font-family: 'Inter', sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color: var(--text-main);
+  background-color: var(--bg-dark);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  min-height: 100vh;
+  overflow-x: hidden;
+  background-color: var(--bg-dark);
+}
+
+/* CRT Scanlines Overlay */
+body::after {
+  content: " ";
+  display: block;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background: linear-gradient(
+    rgba(18, 16, 16, 0) 50%,
+    rgba(0, 0, 0, 0.25) 50%
+  ),
+  linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+  z-index: 9999;
+  background-size: 100% 2px, 3px 100%;
+  pointer-events: none;
+}
+
+h1, h2, h3, h4, h5, h6, .terminal-text {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* Glitch Effect Keyframes */
+@keyframes glitch {
+  0% { transform: translate(0) }
+  20% { transform: translate(-2px, 1px) }
+  40% { transform: translate(-1px, -1px) }
+  60% { transform: translate(2px, 1px) }
+  80% { transform: translate(1px, -1px) }
+  100% { transform: translate(0) }
+}
+
+.glitch-hover:hover {
+  animation: glitch 0.2s linear infinite;
+  color: var(--neon-green);
+}
+
+/* Selection */
+::selection {
+  background: var(--neon-green);
+  color: #000;
+}
