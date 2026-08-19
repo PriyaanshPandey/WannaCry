@@ -1,0 +1,38 @@
+
+/* Netflix Redesign Overrides (Scoped) */
+.netflix-theme-page {
+  --color-bg: #141414;
+  --color-text: #ffffff;
+  --color-primary: #E50914;
+  
+  background-color: #141414;
+  color: #ffffff;
+  font-family: 'Inter', sans-serif;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  min-height: 100vh;
+  z-index: 50; /* Above the global scanlines and navbar */
+}
+
+/* Hide global Navbar and Footer when in Netflix mode */
+body:has(.netflix-theme-page) .app-container > nav,
+body:has(.netflix-theme-page) .app-container > footer {
+  display: none !important;
+}
+
+/* Hide CRT scanlines for Netflix theme */
+body:has(.netflix-theme-page)::after {
+  display: none !important;
+}
+
+/* Override global font for Netflix headers */
+.netflix-theme-page h1,
+.netflix-theme-page h2,
+.netflix-theme-page h3,
+.netflix-theme-page h4,
+.netflix-theme-page h5,
+.netflix-theme-page h6 {
+  font-family: 'Inter', sans-serif !important;
+}

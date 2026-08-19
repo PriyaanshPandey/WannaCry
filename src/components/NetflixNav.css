@@ -1,0 +1,82 @@
+.netflix-nav {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  padding: 0 4%;
+  height: 68px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 100;
+  transition: background-color 0.4s;
+  background-image: linear-gradient(to bottom, rgba(0,0,0,0.7) 10%, rgba(0,0,0,0));
+}
+
+.netflix-nav.scrolled {
+  background-color: #141414;
+}
+
+.nav-left, .nav-right {
+  display: flex;
+  align-items: center;
+}
+
+.nav-logo {
+  color: #E50914;
+  font-size: 1.8rem;
+  font-weight: 800;
+  letter-spacing: 2px;
+  margin-right: 40px;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+}
+
+.nav-links {
+  display: flex;
+  list-style: none;
+  gap: 20px;
+  font-size: 0.85rem;
+}
+
+.nav-links a {
+  color: #e5e5e5;
+  text-decoration: none;
+  transition: color 0.4s;
+}
+
+.nav-links a:hover {
+  color: #b3b3b3;
+}
+
+.nav-links a.active {
+  font-weight: 700;
+  color: #fff;
+}
+
+.nav-right {
+  gap: 20px;
+}
+
+.nav-icon {
+  color: white;
+  cursor: pointer;
+}
+
+.nav-text {
+  color: white;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.nav-profile {
+  background-color: #333;
+  border-radius: 4px;
+  padding: 2px;
+  cursor: pointer;
+}
+
+@media (max-width: 768px) {
+  .nav-links {
+    display: none;
+  }
+}

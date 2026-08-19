@@ -1,0 +1,77 @@
+.netflix-row {
+  margin-left: 4%;
+  color: white;
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+  position: relative;
+  z-index: 10;
+}
+
+.row-title {
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: #e5e5e5;
+  cursor: pointer;
+  display: inline-block;
+  transition: color 0.3s;
+}
+
+.row-title:hover {
+  color: white;
+}
+
+.row-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.row-posters {
+  display: flex;
+  overflow-x: scroll;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  padding: 10px 0 20px 0; /* extra padding for hover scaling */
+  scroll-behavior: smooth;
+}
+
+.row-posters::-webkit-scrollbar {
+  display: none;
+}
+
+.row-nav {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 40px;
+  height: 140px; /* match card height */
+  margin: auto 0;
+  background-color: rgba(20,20,20,0.5);
+  cursor: pointer;
+  z-index: 50;
+  opacity: 0;
+  transition: all 0.2s;
+  color: white;
+}
+
+.row-nav.hidden {
+  display: none;
+}
+
+.row-nav:hover {
+  background-color: rgba(20,20,20,0.7);
+  transform: scale(1.1);
+}
+
+.row-container:hover .row-nav {
+  opacity: 1;
+}
+
+.row-nav.left {
+  left: -4%; /* Adjust to counteract row margin */
+}
+
+.row-nav.right {
+  right: 0;
+}
