@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Outfit:wght@300;400;600;900&family=JetBrains+Mono:wght@400;700&display=swap');
+
 :root {
   /* Colors */
   --color-bg: #050505;
@@ -9,10 +11,11 @@
   --color-text-main: #f0f0f0;
   --color-text-muted: #888888;
   --color-border: #333333;
-  --color-border-glow: #00ff9d55;
+  --color-border-glow: rgba(0, 255, 157, 0.2);
   
   /* Typography */
-  --font-main: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-main: 'Outfit', system-ui, -apple-system, sans-serif;
+  --font-display: 'Cinzel', serif;
   --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
   
   /* Spacing */
